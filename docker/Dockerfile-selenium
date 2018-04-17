@@ -1,0 +1,5 @@
+FROM selenium/standalone-chrome-debug
+
+LABEL maintainer="Khary Sharpe <ksharpe@email.com>"
+
+RUN x11vnc -storepasswd password /home/seluser/.vnc/passwd

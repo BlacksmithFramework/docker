@@ -1,0 +1,3 @@
+FROM mailhog/mailhog
+
+LABEL maintainer="Khary Sharpe <ksharpe@email.com>"

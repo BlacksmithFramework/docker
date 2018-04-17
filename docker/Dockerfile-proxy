@@ -1,0 +1,26 @@
+FROM nginx:1.12
+
+LABEL maintainer="Khary Sharpe <ksharpe@email.com>"
+
+RUN DEBIAN_FRONTEND="noninteractive" apt-get update && apt-get -y install curl
+
+# NOT FOUND response
+COPY ./proxy/backend-not-found.html /var/www/html/backend-not-found.html
+
+# Default conf for proxy service
+COPY ./proxy/default.conf /etc/nginx/conf.d/default.conf
+
+# Proxy configurations
+COPY ./proxy/proxy.conf /etc/nginx/includes/proxy.conf
+
+# TODO:
+# - Add SSL certificate to reverse proxy
+# Nginx configuration
+COPY ./proxy/nginx.conf /etc/nginx/nginx.conf
+
+# SSL Configuration
+#RUN mkdir -p /etc/ssl/private
+#COPY ./ssl-certs/certificate-authority.crt /tmp/IntermediateCA.crt
+#COPY ./ssl-certs/ssl-certificate.crt /tmp/ssl-certificate.crt
+#RUN cat /tmp/ssl-certificate.crt /tmp/IntermediateCA.crt >> /etc/ssl/private/webapp.crt
+#COPY ./ssl-certs/private.key /etc/ssl/private/webapp.key

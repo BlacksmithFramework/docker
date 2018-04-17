@@ -1,0 +1,25 @@
+version: "3"
+
+services:
+  mailhog:
+    container_name: mailhog
+    build:
+      context: ./docker
+      dockerfile: Dockerfile-mailhog
+    restart: always
+    ports:
+      - 1025:1025
+      - 8025:8025
+    networks:
+      - webapp-network  
+  selenium:
+    container_name: selenium
+    build:
+      context: ./docker
+      dockerfile: Dockerfile-selenium
+    restart: always
+    ports:
+      - 4444:4444
+      - 5900:5900
+    networks:
+      - webapp-network
