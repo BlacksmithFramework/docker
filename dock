@@ -147,7 +147,7 @@ then
   -v files/letsencrypt/certs:/etc/letsencrypt \
   -v files/letsencrypt/lib:/var/lib/letsencrypt \
   -v files/letsencrypt/log:/var/log/letsencrypt \
-  -v "files/ssl-site:/data/letsencrypt" \
+  -v "files/letsencrypt/ssl-site:/data/letsencrypt" \
   certbot/certbot \
   certonly --webroot \
   --register-unsafely-without-email --agree-tos \

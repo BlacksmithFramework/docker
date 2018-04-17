@@ -10,7 +10,7 @@ services:
     ports:
       - "80:80"
     volumes:
-      - ./files/ssl-site:/usr/share/nginx/html
+      - ./files/letsencrypt/ssl-site:/usr/share/nginx/html
     networks:
       - ssl-network
 
