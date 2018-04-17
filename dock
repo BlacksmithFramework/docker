@@ -1,17 +1,16 @@
 #!/bin/bash
 #!/
-export XDEBUG_HOST=$(ipconfig getifaddr en0)
 
-if [ "$1" = "force-build" ]
+if [ "$1" = "rebuild" ]
 then
-  echo "Building containers without using cache"
+  echo "Building production containers without using cache"
   docker-compose -f docker-compose.yml build --no-cache ${2}
   exit 0
 fi
 
-if [ "$1" = "force-build:dev" ]
+if [ "$1" = "rebuild:dev" ]
 then
-  echo "Building containers without using cache"
+  echo "Building development containers without using cache"
   docker-compose -f docker-compose.yml -f docker-compose-local.yml build --no-cache ${2}
   exit 0
 fi
@@ -25,26 +24,26 @@ fi
 
 if [ "$1" = "build:dev" ]
 then
-  echo "Builiding containers"
+  echo "Builiding development containers"
   docker-compose -f docker-compose.yml -f docker-compose-local.yml build ${2}
   exit 0
 fi
 
 if [ "$1" = "start:dev" ]
 then
-  echo "Starting containers"
+  echo "Starting development containers"
   docker-compose -f docker-compose.yml -f docker-compose-local.yml up -d ${2}
   exit 0
 fi
 
 if [ "$1" = "dev" ]
 then
-  echo "Starting containers"
+  echo "Starting development containers"
   docker-compose -f docker-compose.yml -f docker-compose-local.yml up ${2}
   exit 0
 fi
 
-if [ "$1" = "watch" ]
+if [ "$1" = "logs" ]
 then
   echo "Watching container logs"
   docker-compose logs --follow ${2}
@@ -53,14 +52,14 @@ fi
 
 if [ "$1" = "start" ]
 then
-  echo "Starting containers"
+  echo "Starting production containers"
   docker-compose -f docker-compose.yml up -d ${2} && docker ps
   exit 0
 fi
 
 if [ "$1" = "stop" ]
 then
-  echo "Stopping containers"
+  echo "Stopping all containers"
   docker-compose -f docker-compose.yml -f docker-compose-local.yml stop ${2} && docker-compose rm -f ${2} && docker ps
   exit 0
 fi
@@ -74,14 +73,14 @@ fi
 
 if [ "$1" = "restart" ]
 then
-  echo "Restarting containers"
+  echo "Restarting production containers"
   ./dock stop ${2} && sh dock start ${2}
   exit 0
 fi
 
 if [ "$1" = "restart:dev" ]
 then
-  echo "Restarting containers"
+  echo "Restarting development containers"
   ./dock stop ${2} && sh dock start:dev ${2}
   exit 0
 fi
@@ -121,26 +120,76 @@ then
   exit 0
 fi
 
+if [ "$1" = "cert:create" ]
+then
+  echo "Creating SSL certificate"
+  docker-compose -f docker-compose-ssl.yml up
+  exit 0
+fi
+
+if [ "$1" = "cert:renew" ]
+then
+  echo "Renewing SSL"
+  # docker exec -it ${2} bash
+  exit 0
+fi
+
+if [ "$1" = "cert:status" ]
+then
+  echo "Checking certificate status"
+  # docker exec -it ${2} bash
+  exit 0
+fi
+
+if [ "$1" = "cert:dryrun" ]
+then
+  docker run -it --rm \
+  -v files/letsencrypt/certs:/etc/letsencrypt \
+  -v files/letsencrypt/lib:/var/lib/letsencrypt \
+  -v files/letsencrypt/log:/var/log/letsencrypt \
+  -v "files/ssl-site:/data/letsencrypt" \
+  certbot/certbot \
+  certonly --webroot \
+  --register-unsafely-without-email --agree-tos \
+  --webroot-path=/data/letsencrypt \
+  --staging \
+  -d ${2} -d ${3}
+exit 0
+fi
+
 
 echo ""
-echo "Usage: dock <command>"
+echo "Usage: dock <command> [container]"
 echo ""
 echo "e.g. "
-echo "./dock status"
+echo "./dock start php"
 echo ""
 echo ""
 echo "General Commands:"
 echo ""
-echo "build .............. Build containers for development"
-echo "force-build ........ Build containers for development without using cache"
-echo "watch .............. Bring container up and attached"
-echo "start .............. Bring container up and dettached"
-echo "stop ............... Stop containers"
+echo "build .............. Build production containers"
+echo "rebuild ............ Build production containers without using cache (force build)"
+echo "logs ............... Bring container logs"
+echo "start .............. Bring production container up and dettached"
+echo "stop ............... Stop all containers"
 echo "status ............. Container status"
 echo "prune .............. Prune containers, images, cache etc."
-echo "kill-all ............ Halt all containers"
+echo "kill-all ........... Halt all containers"
 echo "remove-images ...... Erase all images"
 echo "shell .............. Start a bash shell"
+echo ""
+echo ""
+echo "build:dev .......... Build development containers"
+echo "rebuild:dev ........ Build development containers without using cache (force build)"
+echo "start:dev .......... Bring development container up and dettached"
+echo "dev ................ Bring development container up and attached"
+echo ""
+echo ""
+echo "cert:create ........ Create a new SSL certificate"
+echo "cert:renew ......... Renew SSL certificate"
+echo "cert:status ........ Check the status of SSL certificate"
+echo ""
+echo ""
 echo ""
 echo ""
 echo "Examples:"
@@ -150,5 +199,4 @@ echo "./dock start"
 echo "./dock status"
 echo "./dock stop"
 
-
-exit 0
+exit 1

@@ -1,0 +1,19 @@
+version: "3"
+
+services:
+  ssl:
+    container_name: ssl
+    build:
+      context: ./docker
+      dockerfile: Dockerfile-ssl
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./files/ssl-site:/usr/share/nginx/html
+    networks:
+      - ssl-network
+
+networks:
+    ssl-network:
+        driver: bridge

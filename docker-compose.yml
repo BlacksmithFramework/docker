@@ -32,14 +32,6 @@ services:
       - 2080:2080
     networks:
       - webapp-network
-  certbot:
-    container_name: certbot
-    build:
-      context: ./docker
-      dockerfile: Dockerfile-certbot
-    restart: always
-    networks:
-      - webapp-network
   laravel-echo-server:
     container_name: laravel-echo-server
     build:
